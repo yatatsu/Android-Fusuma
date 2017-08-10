@@ -1,0 +1,15 @@
+apply plugin: 'java'
+
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+dependencies {
+    implementation 'com.android.tools.lint:lint-api:25.3.3'
+    implementation 'com.android.tools.lint:lint-checks:25.3.3'
+}
+
+jar {
+    manifest {
+        attributes('Lint-Registry': 'com.github.yatatsu.fusuma.lint.IssueRegistry')
+    }
+}
