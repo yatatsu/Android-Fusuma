@@ -1,4 +1,34 @@
-apply plugin: 'java-library'
+apply plugin: 'com.android.library'
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
+
+android {
+  compileSdkVersion 26
+  buildToolsVersion "26.0.1"
+  defaultConfig {
+    minSdkVersion 14
+    targetSdkVersion 26
+  }
+}
+
+configurations {
+  lintChecks
+}
+
+dependencies {
+  lintChecks project(path: ':fusuma-lint', configuration: 'lintChecks')
+}
+
+task copyLintJar(type: Copy) {
+  from(configurations.lintChecks) {
+    rename { 'lint.jar' }
+  }
+  into System.getProperty('user.home') + '/.android/lint/'
+  //into 'build/intermediates/lint/'
+}
+
+project.afterEvaluate {
+  def compileLintTask = project.tasks.find { it.name == 'compileLint' }
+  compileLintTask.dependsOn(copyLintJar)
+}
