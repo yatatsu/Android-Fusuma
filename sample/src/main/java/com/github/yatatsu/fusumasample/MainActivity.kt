@@ -1,7 +1,7 @@
 package com.github.yatatsu.fusumasample
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,5 +11,8 @@ class MainActivity : AppCompatActivity() {
 
     val feature = GreatNewFeature()
     feature.call()
+
+    val conditional = ConditionalFeature()
+    conditional.call()
   }
 }

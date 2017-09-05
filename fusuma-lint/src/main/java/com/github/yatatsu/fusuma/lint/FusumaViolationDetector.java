@@ -9,7 +9,9 @@ import com.android.tools.lint.detector.api.JavaContext;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
 import java.util.Collections;
 import java.util.List;
 import org.jetbrains.uast.UCallExpression;
@@ -22,10 +24,15 @@ public final class FusumaViolationDetector extends Detector implements Detector.
     return new Issue[] { ISSUE_CALL_NOT_OPEN_CLASS };
   }
 
-  public static final Issue ISSUE_CALL_NOT_OPEN_CLASS = Issue.create("CallFusuma",
-      "Calling class annotated with Fusuma without any opening condition",
-      "To avoid this violation, you consider use `@OpenFusuma` annotation to your method.",//TODO
-      Category.CORRECTNESS, 5, Severity.ERROR,
+  private static final String FUSUMA_ANNOTATION_NAME = "com.github.yatatsu.fusuma.annotation.Fusuma";
+  private static final String FUSUMA_OPEN_IF_ATTRIBUTE = "openIf";
+
+  private static final String ISSUE_ID = "CallFusuma";
+  private static final String LINT_ERROR_TITLE = "Illegal call with @Fusuma annotation.";
+  private static final String LINT_ERROR_BODY = "Annotated @Fusuma means that should not be called.";
+
+  public static final Issue ISSUE_CALL_NOT_OPEN_CLASS = Issue.create(ISSUE_ID, LINT_ERROR_TITLE,
+      LINT_ERROR_BODY, Category.CORRECTNESS, 5, Severity.ERROR,
       new Implementation(FusumaViolationDetector.class, Scope.JAVA_FILE_SCOPE));
 
   @Override public List<Class<? extends UElement>> getApplicableUastTypes() {
@@ -54,21 +61,24 @@ public final class FusumaViolationDetector extends Detector implements Detector.
     }
 
     private static void detectFusumaCall(JavaContext context, UCallExpression node) {
-      PsiType receiverType = node.getReceiverType();
-      if (receiverType != null) {
-        //for (PsiAnnotation ann : receiverType.getAnnotations()) {
-        //  context.report(ISSUE_CALL_NOT_OPEN_CLASS, node, context.getLocation(node),
-        //      "Illegal call with @Fusuma annotation.");
-        //  return;
-        //}
+      PsiMethod method = node.resolve();
+      if (method != null
+          && method.getContainingClass() != null
+          && method.getContainingClass().getModifierList() != null) {
+        PsiModifierList modifierList = method.getContainingClass().getModifierList();
+        // check annotated with @Fusuma
         PsiAnnotation annotation =
-            receiverType.findAnnotation("com.github.yatatsu.fusuma.annotation.Fusuma");
+            modifierList.findAnnotation(FUSUMA_ANNOTATION_NAME);
         if (annotation != null) {
+          // check openIf option
+          PsiAnnotationMemberValue openIf = annotation.findAttributeValue(FUSUMA_OPEN_IF_ATTRIBUTE);
+          if (openIf != null && openIf.getText().equals("true")) {
+            return;
+          }
           context.report(ISSUE_CALL_NOT_OPEN_CLASS, node, context.getLocation(node),
-              "Illegal call with @Fusuma annotation.");
+              LINT_ERROR_BODY);
         }
-        //context.report(ISSUE_CALL_NOT_OPEN_CLASS, node, context.getLocation(node),
-        //    "Illegal call with @Fusuma annotation.");
+
       }
     }
   }
