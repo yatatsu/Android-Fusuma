@@ -71,7 +71,7 @@ public final class FusumaViolationDetector extends Detector implements Detector.
             modifierList.findAnnotation(FUSUMA_ANNOTATION_NAME);
         if (annotation != null) {
           // check enabled or is suppressed with comment
-          if (context.isEnabled(ISSUE) || context.isSuppressedWithComment(node, ISSUE)) {
+          if (!context.isEnabled(ISSUE) || context.isSuppressedWithComment(node, ISSUE)) {
             return;
           }
           // check openIf option
