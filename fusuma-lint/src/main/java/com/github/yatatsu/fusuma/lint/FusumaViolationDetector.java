@@ -21,7 +21,7 @@ import org.jetbrains.uast.visitor.AbstractUastVisitor;
 public final class FusumaViolationDetector extends Detector implements Detector.UastScanner {
 
   static Issue[] getIssues() {
-    return new Issue[] { ISSUE_CALL_NOT_OPEN_CLASS };
+    return new Issue[] { ISSUE };
   }
 
   private static final String FUSUMA_ANNOTATION_NAME = "com.github.yatatsu.fusuma.annotation.Fusuma";
@@ -31,7 +31,7 @@ public final class FusumaViolationDetector extends Detector implements Detector.
   private static final String LINT_ERROR_TITLE = "Illegal call with @Fusuma annotation.";
   private static final String LINT_ERROR_BODY = "Annotated @Fusuma means that should not be called.";
 
-  public static final Issue ISSUE_CALL_NOT_OPEN_CLASS = Issue.create(ISSUE_ID, LINT_ERROR_TITLE,
+  static final Issue ISSUE = Issue.create(ISSUE_ID, LINT_ERROR_TITLE,
       LINT_ERROR_BODY, Category.CORRECTNESS, 5, Severity.ERROR,
       new Implementation(FusumaViolationDetector.class, Scope.JAVA_FILE_SCOPE));
 
@@ -70,13 +70,16 @@ public final class FusumaViolationDetector extends Detector implements Detector.
         PsiAnnotation annotation =
             modifierList.findAnnotation(FUSUMA_ANNOTATION_NAME);
         if (annotation != null) {
+          // check enabled or is suppressed with comment
+          if (context.isEnabled(ISSUE) || context.isSuppressedWithComment(node, ISSUE)) {
+            return;
+          }
           // check openIf option
           PsiAnnotationMemberValue openIf = annotation.findAttributeValue(FUSUMA_OPEN_IF_ATTRIBUTE);
           if (openIf != null && openIf.getText().equals("true")) {
             return;
           }
-          context.report(ISSUE_CALL_NOT_OPEN_CLASS, node, context.getLocation(node),
-              LINT_ERROR_BODY);
+          context.report(ISSUE, node, context.getLocation(node), LINT_ERROR_BODY);
         }
 
       }
