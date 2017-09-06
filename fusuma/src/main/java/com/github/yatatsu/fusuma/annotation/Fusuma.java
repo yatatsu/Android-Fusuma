@@ -1,9 +1,10 @@
 package com.github.yatatsu.fusuma.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 
 /**
  * Annotation for class that you'd like to isolate.
@@ -13,8 +14,8 @@ import java.lang.annotation.Target;
  * 1. Set true to {@link Fusuma#openIf()}, then the warning will be suppressed.
  * 2. Annotate method with {@link OpenFusuma}. You can specify target class.
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.CLASS)
+@Retention(CLASS)
+@Target(TYPE)
 public @interface Fusuma {
 
   /**
