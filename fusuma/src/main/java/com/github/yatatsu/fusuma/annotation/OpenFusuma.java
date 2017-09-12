@@ -8,16 +8,18 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
 /**
- * TODO
+ * Annotation for type or method, that you'd like to avoid lint with {@link Fusuma}.
+ * You can suppress  specify type using {@link OpenFusuma#targetType()}
+ *
  */
 @Retention(CLASS)
 @Target({ TYPE, METHOD })
 public @interface OpenFusuma {
 
   /**
-   * TODO
+   * The target type for suppressing.
    *
-   * @return
+   * @return class name you'd like to skip the lint by {@link Fusuma}.
    */
   Class<?> targetType() default Object.class;
 }

@@ -8,8 +8,8 @@ configurations {
 }
 
 dependencies {
-  implementation 'com.android.tools.lint:lint-api:26.0.0-beta4'
-  implementation 'com.android.tools.lint:lint-checks:26.0.0-beta4'
+  implementation 'com.android.tools.lint:lint-api:26.0.0-beta5'
+  implementation 'com.android.tools.lint:lint-checks:26.0.0-beta5'
 
   lintChecks files(jar)
 }
